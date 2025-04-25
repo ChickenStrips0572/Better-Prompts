@@ -6,9 +6,9 @@
 
     reference
 
-    :listeningpromts(Name:string) is to check if the code is listenting to a promt.
+    :listeningprompts(Name:string) is to check if the code is listenting to a promt.
 
-	:Add(Listen:string,Module:ModuleScript) is to add a promt to listen to.
+	:Add(Listen:string,Module:ModuleScript) is to add a prompt to listen to.
 
 	:remove(Listen:string) is to remove a promt that are being listen to.
 ]]
@@ -38,7 +38,7 @@ function Better_Prompts:ListeningtoPrompt(Listen:string):boolean
 	return false
 end
 
-function Better_Prompts:Add(Listen:string,Module:ModuleScript|nil)
+function Better_Prompts:Add(Listen:string , Module:ModuleScript|nil)
 	if Better_Prompts:ListeningtoPrompt(Listen) == false and Runservice:IsServer() then
 		local temptable:ServerListenTemp = {
 			promptName = Listen,
@@ -66,7 +66,7 @@ function Better_Prompts:Remove(Listen:string)
 	end
 end
 
-local function TriggerAlowed(Plyr:Player,Prompt:ProximityPrompt):boolean|nil -- figures out if trigger was possable
+local function TriggerAlowed(Plyr:Player , Prompt:ProximityPrompt):boolean|nil -- figures out if trigger was possable
 	if Runservice:IsServer() then
 		
 		if Prompt.RequiresLineOfSight == false then

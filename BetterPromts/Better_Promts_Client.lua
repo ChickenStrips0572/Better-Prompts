@@ -11,7 +11,7 @@ end
 
 event = module:FindFirstChildOfClass("RemoteEvent")
 
-event.OnClientEvent:Connect(function(Action:string,Name:string)
+event.OnClientEvent:Connect(function(Action:string , Name:string)
 	if Action == "Add" then
 		table.insert(listeningpromts,Name)
 		
