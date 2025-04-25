@@ -1,63 +1,62 @@
 --[[
-        Better_Promts
+      Better_Promts
 
-	written by the_beanz68(ChickenStrips0572)
+		written by the_beanz68(ChickenStrips0572)
     made to fix an issue with trying to refreance Proximity Prompts.
 
-    refreances
+    reference
 
     :listeningpromts(Name:string) is to check if the code is listenting to a promt.
 
-    :Add(Listen:string,Module:ModuleScript) is to add a promt to listen to.
+	:Add(Listen:string,Module:ModuleScript) is to add a promt to listen to.
 
-    :remove(Listen:string) is to remove a promt that are being listen to.
+	:remove(Listen:string) is to remove a promt that are being listen to.
 ]]
 
 
 
+local Better_Prompts = {}
 
-local Better_Promts = {}
-
-local Serverlisteningpromts = {}
+local Serverlisteningprompts = {}
 local Runservice = game:GetService("RunService")
 local Event
 
 type ServerListenTemp = {
-	promtName:string,
+	promptName:string,
 	Module:ModuleScript?
 }
 
 
 
 
-function Better_Promts:ListeningtoPromt(Listen:string):boolean
-	for _,V in Serverlisteningpromts do
-		if V.promtName == Listen then
+function Better_Prompts:ListeningtoPrompt(Listen:string):boolean
+	for _,V in Serverlisteningprompts do
+		if V.promptName == Listen then
 			return true
 		end
 	end
 	return false
 end
 
-function Better_Promts:Add(Listen:string,Module:ModuleScript|nil)
-	if Better_Promts:ListeningtoPromt(Listen) == false and Runservice:IsServer() then
+function Better_Prompts:Add(Listen:string,Module:ModuleScript|nil)
+	if Better_Prompts:ListeningtoPrompt(Listen) == false and Runservice:IsServer() then
 		local temptable:ServerListenTemp = {
-			promtName = Listen,
+			promptName = Listen,
 			Module = Module
 		}
-		table.insert(Serverlisteningpromts,temptable)
+		table.insert(Serverlisteningprompts,temptable)
 		
 		if script:FindFirstChildOfClass("RemoteEvent") then
-			script:FindFirstChildOfClass("RemoteEvent"):FireAllClients("Add",temptable.promtName)
+			script:FindFirstChildOfClass("RemoteEvent"):FireAllClients("Add",temptable.promptName)
 		end
 	end
 end
 
-function Better_Promts:Remove(Listen:string)
+function Better_Prompts:Remove(Listen:string)
 	if Runservice:IsServer() then
-		for Num,V in Serverlisteningpromts do
-			if V.promtName == Listen then
-				table.remove(Serverlisteningpromts,Num)
+		for Num,V in Serverlisteningprompts do
+			if V.promptName == Listen then
+				table.remove(Serverlisteningprompts,Num)
 				break
 			end
 		end
@@ -67,47 +66,47 @@ function Better_Promts:Remove(Listen:string)
 	end
 end
 
-local function TriggerAlowed(Plyr:Player,Promt:ProximityPrompt):boolean|nil
+local function TriggerAlowed(Plyr:Player,Prompt:ProximityPrompt):boolean|nil -- figures out if trigger was possable
 	if Runservice:IsServer() then
 		
-		if Promt.RequiresLineOfSight == false then
-			if (Plyr.Character:GetPivot().Position -  Promt.Parent.Position).Magnitude < Promt.MaxActivationDistance then
-				for _,Tab:ServerListenTemp in Serverlisteningpromts do
-					if Tab.promtName == Promt.Name then
+		if Prompt.RequiresLineOfSight == false then
+			if (Plyr.Character:GetPivot().Position -  Prompt.Parent.Position).Magnitude < Prompt.MaxActivationDistance then
+				for _,Tab:ServerListenTemp in Serverlisteningprompts do
+					if Tab.promptName == Prompt.Name then
 						local suc,err = pcall(function()
-							require(Tab.Module):Trigger(Plyr,Promt)
+							require(Tab.Module):Trigger(Plyr,Prompt)
 						end)
 						if not suc then
-							print(err)
+							print(Prompt.Name .. "Module Trigger Error")
+							warn(Prompt.Name .. err)
 						end
 						break
 					end
 				end
 			end
 		else
-			--TODO:
+			--TODO: add line of sight logic
 		end
 		return false
 	end
 	warn("Trigger allowed checking is server side only")
+	return 
 end
 
 
 -- auto init
 if Runservice:IsServer() and not script:FindFirstChildOfClass("RemoteEvent") then
-
-
 	Instance.new("RemoteEvent").Parent = script
 	
 	game.Players.PlayerAdded:Connect(function(plyr)
-		for _,Tab in Serverlisteningpromts do
-			script:FindFirstChildOfClass("RemoteEvent"):FireClient(plyr,"Add",Tab.promtName)
+		for _,Tab in Serverlisteningprompts do
+			script:FindFirstChildOfClass("RemoteEvent"):FireClient(plyr,"Add",Tab.promptName)
 		end
 	end)
-	script:FindFirstChildOfClass("RemoteEvent").OnServerEvent:Connect(function(plyr,Promt)
-		TriggerAlowed(plyr,Promt)
+	script:FindFirstChildOfClass("RemoteEvent").OnServerEvent:Connect(function(plyr,Prompt)
+		TriggerAlowed(plyr,Prompt)
 	end)
 end
 
 
-return Better_Promts
+return Better_Prompts
