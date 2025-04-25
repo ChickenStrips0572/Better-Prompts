@@ -22,14 +22,14 @@ local Runservice = game:GetService("RunService")
 local Event
 
 type ServerListenTemp = {
-	promptName:string,
-	Module:ModuleScript?
+	promptName: string,
+	Module: ModuleScript?
 }
 
 
 
 
-function Better_Prompts:IsListeningtoPrompt(Listen:string):boolean
+function Better_Prompts:IsListeningtoPrompt(Listen: string): boolean
 	for _,V in Serverlisteningprompts do
 		if V.promptName == Listen then
 			return true
@@ -38,9 +38,9 @@ function Better_Prompts:IsListeningtoPrompt(Listen:string):boolean
 	return false
 end
 
-function Better_Prompts:Add(Listen:string , Module:ModuleScript|nil)
+function Better_Prompts:Add(Listen: string , Module :ModuleScript|nil)
 	if Better_Prompts:IsListeningtoPrompt(Listen) == false and Runservice:IsServer() then
-		local temptable:ServerListenTemp = {
+		local temptable: ServerListenTemp = {
 			promptName = Listen,
 			Module = Module
 		}
@@ -52,7 +52,7 @@ function Better_Prompts:Add(Listen:string , Module:ModuleScript|nil)
 	end
 end
 
-function Better_Prompts:Remove(Listen:string)
+function Better_Prompts:Remove(Listen: string)
 	if Runservice:IsServer() then
 		for Num,V in Serverlisteningprompts do
 			if V.promptName == Listen then
@@ -66,12 +66,12 @@ function Better_Prompts:Remove(Listen:string)
 	end
 end
 
-local function TriggerAlowed(Plyr:Player , Prompt:ProximityPrompt):boolean|nil -- figures out if trigger was possable
+local function TriggerAllowed(Plyr: Player , Prompt: ProximityPrompt):boolean|nil -- figures out if trigger was possable
 	if Runservice:IsServer() then
 		
 		if Prompt.RequiresLineOfSight == false then
 			if (Plyr.Character:GetPivot().Position -  Prompt.Parent.Position).Magnitude < Prompt.MaxActivationDistance then
-				for _,Tab:ServerListenTemp in Serverlisteningprompts do
+				for _,Tab: ServerListenTemp in Serverlisteningprompts do
 					if Tab.promptName == Prompt.Name then
 						local suc,err = pcall(function()
 							require(Tab.Module):Trigger(Plyr,Prompt)
