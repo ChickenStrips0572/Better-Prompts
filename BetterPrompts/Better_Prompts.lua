@@ -1,12 +1,12 @@
 --[[
-      Better_Promts
+	Better_Promts
 
-		written by the_beanz68(ChickenStrips0572)
+	written by the_beanz68(ChickenStrips0572)
     made to fix an issue with trying to refreance Proximity Prompts.
 
     reference
 
-    :listeningpromts(Name:string) is to check if the code is listenting to a promt.
+    :listeningprompts(Name:string) is to check if the code is listenting to a promt.
 
     :Add(Listen:string,Module:ModuleScript) is to add a promt to listen to.
 

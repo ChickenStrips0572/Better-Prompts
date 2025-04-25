@@ -13,7 +13,7 @@ checks if the system is listening to a specific prompt if it is it returns "true
 ```bash
 :Add("PromptName" , "Module Script") 
 ```
-Adds a promt to be listened for by the system
+Adds a prompt to be listened for by the system
 
 ### Removing Prompts
 ```bash
