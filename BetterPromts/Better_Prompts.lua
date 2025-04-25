@@ -6,11 +6,11 @@
 
     reference
 
-    :listeningprompts(Name:string) is to check if the code is listenting to a promt.
+    :listeningpromts(Name:string) is to check if the code is listenting to a promt.
 
-	:Add(Listen:string,Module:ModuleScript) is to add a prompt to listen to.
+    :Add(Listen:string,Module:ModuleScript) is to add a promt to listen to.
 
-	:remove(Listen:string) is to remove a promt that are being listen to.
+    :remove(Listen:string) is to remove a promt that are being listen to.
 ]]
 
 
@@ -29,7 +29,7 @@ type ServerListenTemp = {
 
 
 
-function Better_Prompts:ListeningtoPrompt(Listen:string):boolean
+function Better_Prompts:IsListeningtoPrompt(Listen:string):boolean
 	for _,V in Serverlisteningprompts do
 		if V.promptName == Listen then
 			return true
@@ -39,15 +39,15 @@ function Better_Prompts:ListeningtoPrompt(Listen:string):boolean
 end
 
 function Better_Prompts:Add(Listen:string , Module:ModuleScript|nil)
-	if Better_Prompts:ListeningtoPrompt(Listen) == false and Runservice:IsServer() then
+	if Better_Prompts:IsListeningtoPrompt(Listen) == false and Runservice:IsServer() then
 		local temptable:ServerListenTemp = {
 			promptName = Listen,
 			Module = Module
 		}
 		table.insert(Serverlisteningprompts,temptable)
 		
-		if script:FindFirstChildOfClass("RemoteEvent") then
-			script:FindFirstChildOfClass("RemoteEvent"):FireAllClients("Add",temptable.promptName)
+		if Event then
+			Event:FireAllClients("Add",temptable.promptName)
 		end
 	end
 end
@@ -60,8 +60,8 @@ function Better_Prompts:Remove(Listen:string)
 				break
 			end
 		end
-		if script:FindFirstChildOfClass("RemoteEvent") then
-			script:FindFirstChildOfClass("RemoteEvent"):FireAllClients("Remove",Listen)
+		if Event then
+			Event:FireAllClients("Remove",Listen)
 		end
 	end
 end
@@ -95,15 +95,18 @@ end
 
 
 -- auto init
-if Runservice:IsServer() and not script:FindFirstChildOfClass("RemoteEvent") then
-	Instance.new("RemoteEvent").Parent = script
+if Runservice:IsServer() and not script:FindFirstChildOfClass("RemoteEvent") then -- server auto-init
+	Event = Instance.new("RemoteEvent")
+	Event.Parent = script
+	
+	
 	
 	game.Players.PlayerAdded:Connect(function(plyr)
 		for _,Tab in Serverlisteningprompts do
-			script:FindFirstChildOfClass("RemoteEvent"):FireClient(plyr,"Add",Tab.promptName)
+			Event:FireClient(plyr,"Add",Tab.promptName)
 		end
 	end)
-	script:FindFirstChildOfClass("RemoteEvent").OnServerEvent:Connect(function(plyr,Prompt)
+	Event.OnServerEvent:Connect(function(plyr,Prompt)
 		TriggerAlowed(plyr,Prompt)
 	end)
 end
