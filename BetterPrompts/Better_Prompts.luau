@@ -19,7 +19,9 @@ local Better_Prompts = {}
 
 local Serverlisteningprompts = {}
 local Runservice = game:GetService("RunService")
-local Event
+local PromtService = game:GetService("ProximityPromptService")
+
+
 
 type ServerListenTemp = {
 	promptName: string,
@@ -45,10 +47,6 @@ function Better_Prompts:Add(Listen: string , Module :ModuleScript|nil)
 			Module = Module
 		}
 		table.insert(Serverlisteningprompts,temptable)
-		
-		if Event then
-			Event:FireAllClients("Add",temptable.promptName)
-		end
 	end
 end
 
@@ -60,15 +58,12 @@ function Better_Prompts:Remove(Listen: string)
 				break
 			end
 		end
-		if Event then
-			Event:FireAllClients("Remove",Listen)
-		end
 	end
 end
 
 local function TriggerAllowed(Plyr: Player , Prompt: ProximityPrompt):boolean|nil -- figures out if trigger was possable
 	if Runservice:IsServer() then
-		
+
 		if Prompt.RequiresLineOfSight == false then
 			if (Plyr.Character:GetPivot().Position -  Prompt.Parent.Position).Magnitude < Prompt.MaxActivationDistance then
 				for _,Tab: ServerListenTemp in Serverlisteningprompts do
@@ -94,20 +89,17 @@ local function TriggerAllowed(Plyr: Player , Prompt: ProximityPrompt):boolean|ni
 end
 
 
+
 -- auto init
-if Runservice:IsServer() and not script:FindFirstChildOfClass("RemoteEvent") then -- server auto-init
-	Event = Instance.new("RemoteEvent")
-	Event.Parent = script
+
+local triggered = false
+
+
+if Runservice:IsServer() and not triggered then -- server auto-init
+	triggered = true
 	
-	
-	
-	game.Players.PlayerAdded:Connect(function(plyr)
-		for _,Tab in Serverlisteningprompts do
-			Event:FireClient(plyr,"Add",Tab.promptName)
-		end
-	end)
-	Event.OnServerEvent:Connect(function(plyr,Prompt)
-		TriggerAlowed(plyr,Prompt)
+	PromtService.PromptTriggered:Connect(function(Promt,Plyr)
+		TriggerAllowed(Plyr,Promt)
 	end)
 end
 
